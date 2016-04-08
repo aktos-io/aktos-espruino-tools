@@ -3,10 +3,10 @@
 CURR_PWD=$(pwd)
 
 PORT='/dev/ttyUSB0'
-MAKEFILE_PORT=''
 if [[ "$1" != "" ]]; then
-    MAKEFILE_PORT="PORT=$1"
+    PORT="$1"
 fi
+MAKEFILE_PORT="PORT=${PORT}"
 
 
 wait_port_unplugged () {

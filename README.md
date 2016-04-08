@@ -1,9 +1,6 @@
 # Status
 
-Current status is: Works, needs improvements (**BETA**)
-
-TODO:
-1. Bundling mechanism is hardcoded, fix it.
+Current status: **Works**, but needs improvements (BETA)
 
 # Description
 
@@ -23,6 +20,13 @@ programming embedded devices.
 
 1. Load Espruino firmware (`./load-firmware.sh`) (at least v1.85) to esp
 2. run `python terminal.py` to connect the esp console
+3. Place your application code in `./app/init.ls`
 3. run `python controller.py` to send commands (like "load")
     1. edit `init.ls`
     2. send `load` command in `controller.py` to upload code to the the device
+
+TODO:
+---
+1. Bundling mechanism is hardcoded, add dependency resolve mechanism. 
+2. Use modules from `./modules` folder. 
+3. Improve controller. 
