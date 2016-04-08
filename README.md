@@ -24,9 +24,3 @@ programming embedded devices.
 3. run `python controller.py` to send commands (like "load")
     1. edit `init.ls`
     2. send `load` command in `controller.py` to upload code to the the device
-
-TODO:
----
-1. Bundling mechanism is hardcoded, add dependency resolve mechanism. 
-2. Use modules from `./modules` folder. 
-3. Improve controller. 
