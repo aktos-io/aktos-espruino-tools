@@ -1,7 +1,17 @@
+# Status
+
+Current status is: Works, needs improvements (**BETA**)
+
+TODO:
+1. Bundling mechanism is hardcoded, fix it.
+
 # Description
 
 Tools for programming embedded devices (esp8266, stm32f4, etc...) with
-[Espruino](http://espruino.com) platform. 
+[Espruino](http://espruino.com) platform.
+
+Main objective of this toolset is transparently using [Livescript](http://livescript.net) while
+programming embedded devices.
 
 # Dependencies
 
