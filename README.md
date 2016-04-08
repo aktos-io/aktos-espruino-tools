@@ -1,6 +1,6 @@
 # Status
 
-Current status is: Works, needs improvements (**BETA**)
+Current status: **Works**, but needs improvements (BETA)
 
 # Description
 
