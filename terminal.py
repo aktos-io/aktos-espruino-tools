@@ -1,7 +1,7 @@
 __author__ = 'ceremcem'
 
 from aktos_dcs import *
-
+import os
 
 class TerminalEmulator(SerialPortReader):
     def prepare(self):
@@ -31,13 +31,19 @@ class TerminalEmulator(SerialPortReader):
 
 
     def handle_LoadCode(self, msg):
-        with open("init.min.js", 'r') as f:
-            src = ''.join(f.readlines()).replace("\n", "")
-            print repr(src)
-            self.send_cmd("reset()")
-            sleep(2)
-            self.send_cmd(src)
-            self.send_cmd("save()")
+        app_folder = "app"
+        self.send_cmd("reset()")
+        sleep(4)
+        for file in os.listdir(app_folder):
+            if file.endswith(".min.js"):
+                with open(app_folder + "/" + file, 'r') as f:
+                    for line in f.readlines():
+                        #print "INFO: SENDING CODE LINE: ", repr(line)
+                        self.send_cmd(line)
+                        sleep(0.3)
+
+        sleep(1)
+        self.send_cmd("save()\n")
 
 ProxyActor()
 TerminalEmulator(port="/dev/ttyUSB0", baud=115200)

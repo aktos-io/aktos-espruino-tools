@@ -20,7 +20,9 @@ class Control(Actor):
         if cmd == "load":
             self.send_CompileToLivescript()
             print "sent compile message..."
-
+        elif cmd == "update-libs":
+            print "Updating libs..."
+            run("./update-libs.sh")
         else:
             print "cmd is not recognized..."
 
@@ -29,24 +31,9 @@ class Control(Actor):
 class CompileLivescript(Actor):
 
     def handle_CompileToLivescript(self, msg):
-        """
-        compress: {
-		sequences: true,
-		dead_code: true,
-		conditionals: true,
-		booleans: true,
-		unused: true,
-		if_return: true,
-		join_vars: true,
-		drop_console: true
-		"""
         try:
-            print "Compiling to livescript..."
-            run("lsc -cb init.ls".split())
-            run(("uglifyjs --mangle --compress" + " " +
-                "sequences=true,dead_code=true,conditionals=true,booleans=true,unused=true" +
-                "if_return=true,join_vars=true,drop_console=false" + " " +
-                "-o init.min.js -- init.js").split())
+            print "Compiling livescript to javascript..."
+            run("./make-bundle.sh".split())
             print "Sending 'LoadCode' message..."
             self.send_LoadCode()
         except:
