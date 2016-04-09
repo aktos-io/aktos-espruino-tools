@@ -1,4 +1,5 @@
-__author__ = 'ceremcem'
+#!/usr/bin/env python
+# coding: utf-8
 
 from aktos_dcs import *
 import os
@@ -46,5 +47,9 @@ class TerminalEmulator(SerialPortReader):
         self.send_cmd("save()\n")
 
 ProxyActor()
-TerminalEmulator(port="/dev/ttyUSB0", baud=115200)
+config = AktosConfig("./app/app.conf")
+port = config.get("console.port", "/dev/ttyUSB0")
+baud = config.get("console.baud", 115200)
+print "Configuration: %s @%d baud" % (port, baud)
+TerminalEmulator(port=port, baud=baud)
 wait_all()
