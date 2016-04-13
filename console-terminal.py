@@ -47,7 +47,7 @@ class TerminalEmulator(SerialPortReader):
         self.send_cmd("save()\n")
 
 ProxyActor()
-config = AktosConfig("./app/app.conf")
+config = AktosConfig("./app/config.md")
 port = config.get("console.port", "/dev/ttyUSB0")
 baud = config.get("console.baud", 115200)
 print "Configuration: %s @%d baud" % (port, baud)
