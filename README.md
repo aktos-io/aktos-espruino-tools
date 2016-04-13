@@ -13,7 +13,7 @@ programming embedded devices.
 # Dependencies
 
 1. Livescript
-2. UglifyJs
+2. UglifyJs (>=2.0)
 3. aktos-dcs
 
 # Usage
