@@ -6,9 +6,10 @@ from aktos_dcs import *
 from gevent.subprocess import call
 
 import inspect
-from gevent import os
+import os
 
-DIR=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+DIR=os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe())))
+print "DIRNAME: ", DIR
 
 def run(command):
     retval = call(command)
