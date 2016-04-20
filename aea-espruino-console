@@ -32,7 +32,7 @@ class TerminalEmulator(SerialPortReader):
 
 
     def handle_LoadCode(self, msg):
-        app_folder = "app"
+        app_folder = "."
         self.send_cmd("reset()")
         sleep(4)
         for file in os.listdir(app_folder):
@@ -47,7 +47,7 @@ class TerminalEmulator(SerialPortReader):
         self.send_cmd("save()\n")
 
 ProxyActor()
-config = AktosConfig("./app/config.md")
+config = AktosConfig("./config.md")
 port = config.get("console.port", "/dev/ttyUSB0")
 baud = config.get("console.baud", 115200)
 print "Configuration: %s @%d baud" % (port, baud)

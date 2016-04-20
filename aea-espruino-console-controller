@@ -5,6 +5,10 @@ __author__ = 'ceremcem'
 from aktos_dcs import *
 from gevent.subprocess import call
 
+import inspect
+from gevent import os
+
+DIR=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 def run(command):
     retval = call(command)
@@ -24,7 +28,7 @@ class Control(Actor):
             print "sent compile message..."
         elif cmd == "update-libs":
             print "Updating libs..."
-            run("./update-libs.sh")
+            run(DIR+"/update-libs.sh")
         else:
             print "cmd is not recognized..."
 
@@ -35,13 +39,13 @@ class CompileLivescript(Actor):
     def handle_CompileToLivescript(self, msg):
         try:
             print "Compiling livescript to javascript..."
-            run("./make-bundle.sh".split())
+            run(DIR+"/make-bundle.sh")
             print "Sending 'LoadCode' message..."
             self.send_LoadCode()
         except:
             print "Error while compiling..."
 
-
+print "DIR is : ", DIR
 ProxyActor()
 CompileLivescript()
 Control()
