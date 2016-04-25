@@ -3,6 +3,13 @@
 
 from aktos_dcs import *
 import os
+import argparse
+
+parser = argparse.ArgumentParser(description='Get configuration values')
+parser.add_argument('-b', '--baud', default=None, help='baudrate')
+parser.add_argument('-p', '--port', default=None, help='port to use')
+
+args = parser.parse_args()
 
 class TerminalEmulator(SerialPortReader):
     def prepare(self):
@@ -48,8 +55,18 @@ class TerminalEmulator(SerialPortReader):
 
 ProxyActor()
 config = AktosConfig("./config.md")
-port = config.get("console.port", "/dev/ttyUSB0")
-baud = config.get("console.baud", 115200)
+
+if args.port is None:
+    port = config.get("console.port", "/dev/ttyUSB0")
+else:
+    port = arg.port
+
+try:
+    assert args.baud is not None
+    baud = int(args.baud)
+except:
+    baud = config.get("console.baud", 115200)
+
 print "Configuration: %s @%d baud" % (port, baud)
 TerminalEmulator(port=port, baud=baud)
 wait_all()
