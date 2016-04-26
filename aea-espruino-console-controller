@@ -42,9 +42,23 @@ class CompileLivescript(Actor):
             print "Compiling livescript to javascript..."
             run(DIR+"/make-bundle.sh")
             print "Sending 'LoadCode' message..."
-            self.send_LoadCode()
+            app_folder = "."
+            self.send_LoadCode(code="reset()")
+            sleep(4)
+            for file in os.listdir(app_folder):
+                if file.endswith(".min.js"):
+                    with open(app_folder + "/" + file, 'r') as f:
+                        for line in f.readlines():
+                            #print "INFO: SENDING CODE LINE: ", repr(line)
+                            self.send_LoadCode(code=line)
+                            sleep(0.3)
+
+            sleep(1)
+            self.send_LoadCode(code="save()\n")
+
         except:
             print "Error while compiling..."
+
 
 print "DIR is : ", DIR
 ProxyActor()

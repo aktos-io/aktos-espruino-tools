@@ -17,9 +17,15 @@ class TerminalEmulator(SerialPortReader):
         print "-----------------------------"
         print self.ser
         self.line_endings = "\n"
+        self.serial_queue = Queue()
 
     def action(self):
         self.start_io_prompt()
+
+        while True:
+            x = self.serial_queue.get()
+            print "sending serial queue: ", repr(x.encode('ascii'))
+            self.send_cmd(x.encode('ascii'))
 
     def on_disconnect(self):
         print ""
@@ -39,19 +45,10 @@ class TerminalEmulator(SerialPortReader):
 
 
     def handle_LoadCode(self, msg):
-        app_folder = "."
-        self.send_cmd("reset()")
-        sleep(4)
-        for file in os.listdir(app_folder):
-            if file.endswith(".min.js"):
-                with open(app_folder + "/" + file, 'r') as f:
-                    for line in f.readlines():
-                        #print "INFO: SENDING CODE LINE: ", repr(line)
-                        self.send_cmd(line)
-                        sleep(0.3)
+        print "CODE: ", msg
+        #self.send_cmd(msg["code"])
+        self.serial_queue.put(msg["code"])
 
-        sleep(1)
-        self.send_cmd("save()\n")
 
 ProxyActor()
 config = AktosConfig("./config.md")
