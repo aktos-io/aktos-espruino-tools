@@ -2,6 +2,14 @@
 export sleep = (ms, func) !-> set-timeout func, ms
 export after = sleep
 
+export pack = (x) ->
+    JSON.stringify x
+
+export unpack = (wire-data) ->
+    x = JSON.parse wire-data
+    throw if x is void
+    return x
+
 export detach-repl = !->
     console.log "Disabling REPL console!"
     # access it via LoopbackB
@@ -22,19 +30,20 @@ config-init = !->
     if config-file is null
         config-file := get-file!
 
-export config-write = (file-no, data) !->
-    config-init!
-    config-file.write file-no, JSON.stringify data
+export config =
+    write: (file-no, data) !->
+        config-init!
+        config-file.write file-no, pack data
 
-export config-read = (file-no) ->
-    config-init!
-    data = config-file.read file-no
-    data = E.to-string data
-    try
-        JSON.parse data
-    catch
-        data
-
+    read: (file-no) ->
+        config-init!
+        data = config-file.read file-no
+        data = E.to-string data
+        try
+            unpack data
+        catch
+            config.write file-no, pack {}
+            return {}
 
 export !function Led pin
     self = this
@@ -84,4 +93,3 @@ export !function Led pin
         @write on
 
 
-    
