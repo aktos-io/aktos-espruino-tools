@@ -10,14 +10,15 @@ export unpack = (wire-data) ->
     throw if x is void
     return x
 
-export detach-repl = !->
-    console.log "Disabling REPL console!"
-    # access it via LoopbackB
-    LoopbackA.set-console!
+export repl =
+    detach: !->
+        console.log "Disabling REPL console!"
+        # access it via LoopbackB
+        LoopbackA.set-console!
 
-export attach-repl = !->
-    ser.set-console!
-    console.log "REPL console enabled!"
+    attach: !->
+        ser.set-console!
+        console.log "REPL console enabled!"
 
 
 get-file = ->
@@ -89,7 +90,17 @@ export !function Led pin
         @write off
 
     @turn-on = ->
-        @mode = \turn-on
-        @write on
+        self.mode = \turn-on
+        self.write on
+
+    @turn = (s) ->
+        self.mode = \digital
+        self.write s
+
+    @wink = ->
+        self.mode = \wink
+        self.write on
+        <- sleep 50ms
+        self.write off
 
 
