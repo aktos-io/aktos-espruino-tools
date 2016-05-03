@@ -6,9 +6,14 @@ export pack = (x) ->
     JSON.stringify x
 
 export unpack = (wire-data) ->
-    x = JSON.parse wire-data
-    throw if x is void
-    return x
+    try
+        x = JSON.parse wire-data
+        throw if x is void
+        return x
+    catch
+        console.log "Error on unpacking: ", e
+        console.log "wire data: ", wire-data
+        throw "Error on unpacking"
 
 export repl =
     detach: !->
@@ -21,86 +26,95 @@ export repl =
         console.log "REPL console enabled!"
 
 
-get-file = ->
-    f = new (require "FlashEEPROM")(0x076000)
-    f.endAddr = f.addr+1024
-    return f
-
-config-file = null
-config-init = !->
-    if config-file is null
-        config-file := get-file!
-
-export config =
-    write: (file-no, data) !->
-        config-init!
-        config-file.write file-no, pack data
-
-    read: (file-no) ->
-        config-init!
-        data = config-file.read file-no
-        data = E.to-string data
-        try
-            unpack data
-        catch
-            config.write file-no, pack {}
-            return {}
-
-export !function Led pin
+!function Config file-no
     self = this
+    @file-no = file-no
+    @f = new (require "FlashEEPROM")(0x076000)
+    @f.endAddr = @f.addr + 1024
+    @write-count = 0
+
+Config.prototype.write = (data) !->
+    if @write-count++ > 10
+        @f.cleanup!
+        @write-count = 0
+    @f.write @file-no, pack data
+
+Config.prototype.read = ->
+    try
+        data = E.to-string @f.read @file-no
+        return unpack data
+    catch
+        console.log "ERROR CONFIG READ: ", e
+        console.log "raw data read: ", data
+        console.log "dump: ", @file-no,
+
+
+!function Led pin
     @pin = pin
     pin-mode @pin, \output
     @mode = \turn-off
     @on-time = 1000ms
     @off-time = 1000ms
 
-    @write = (val) ->
-        digital-write @pin, val
 
-    @base-blink = ->
-        if self.mode isnt \blink
-            self.mode = \blink
-            <- :lo(op) ->
-                self.write on if self.mode is \blink
-                <- sleep self.on-time
-                self.write off if self.mode is \blink
-                <- sleep self.off-time
-                return lo(op) if self.mode is \blink
-                return op!
-        console.log "blink ended..."
+Led.prototype.turn = (val) ->
+    @mode = if val then \on else \off
+    digital-write @pin, val
 
-    @blink = ->
-        @on-time = 1000ms
-        @off-time = 1000ms
-        @base-blink!
+Led.prototype.base-blink = ->
+    console.log "iyidir"
+    self = this 
+    if @mode isnt \blink
+        @mode = \blink
+        <- :lo(op) ->
+            digital-write self.pin, on if self.mode is \blink
+            <- sleep self.on-time
+            digital-write self.pin, off if self.mode is \blink
+            <- sleep self.off-time
+            return lo(op) if self.mode is \blink
+            return op!
+        console.log "blink ended, mode: ", self.mode
 
-    @att-blink = ->
-        @on-time = 300ms
-        @off-time = 300ms
-        @base-blink!
+Led.prototype.blink = ->
+    @on-time = 1000ms
+    @off-time = 1000ms
+    @base-blink!
 
-    @info-blink = ->
-        # aircraft blink
-        @on-time = 80ms
-        @off-time = 2000ms
-        @base-blink!
+Led.prototype.att-blink = ->
+    @on-time = 300ms
+    @off-time = 300ms
+    @base-blink!
 
-    @turn-off = ->
-        @mode = \turn-off
-        @write off
+Led.prototype.info-blink = ->
+    # aircraft blink
+    @on-time = 80ms
+    @off-time = 2000ms
+    @base-blink!
 
-    @turn-on = ->
-        self.mode = \turn-on
-        self.write on
-
-    @turn = (s) ->
-        self.mode = \digital
-        self.write s
-
-    @wink = ->
-        self.mode = \wink
-        self.write on
-        <- sleep 50ms
-        self.write off
+Led.prototype.wink = ->
+    @mode = \wink
+    @turn on
+    <- sleep 50ms
+    @turn off
 
 
+
+
+# https://github.com/ceremcem/merge-ls
+export function merge (obj1, ...sources)
+  for obj2 in sources
+    for p of obj2
+      try
+        throw unless obj2[p] instanceof Object
+        obj1[p] = obj1[p] `merge` obj2[p]
+      catch
+        if obj2[p] isnt void
+            obj1[p] = obj2[p]
+        else
+            delete obj1[p]
+  obj1
+
+
+# Exports
+export Config
+export Led
