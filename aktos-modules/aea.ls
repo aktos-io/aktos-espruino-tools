@@ -29,19 +29,19 @@ export repl =
 !function Config file-no
     self = this
     @file-no = file-no
-    @f = new (require "FlashEEPROM")(0x076000)
-    @f.endAddr = @f.addr + 1024
+    Config.f = new (require "FlashEEPROM")(0x076000)
+    Config.f.endAddr = Config.f.addr + 1024
     @write-count = 0
 
 Config.prototype.write = (data) !->
     if @write-count++ > 10
-        @f.cleanup!
+        Config.f.cleanup!
         @write-count = 0
-    @f.write @file-no, pack data
+    Config.f.write @file-no, pack data
 
 Config.prototype.read = ->
     try
-        data = E.to-string @f.read @file-no
+        data = E.to-string Config.f.read @file-no
         return unpack data
     catch
         console.log "ERROR CONFIG READ: ", e
