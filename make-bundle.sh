@@ -15,7 +15,7 @@ AEA_MODULES="${DIR}/aktos-modules"
 # if_return: true,
 # join_vars: true,
 # drop_console: true
-UGLIFYJS_OPTS="-c -m"
+UGLIFYJS_OPTS="-m -c dead_code=true,if_return=true,unused=true,unsafe=true,hoist_vars=true"
 
 lsc -cb init.ls
 
