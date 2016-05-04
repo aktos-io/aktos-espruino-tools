@@ -42,7 +42,8 @@ while true; do
         echo "Modules.addCached(\"${MODULE_NAME}\", \"${MODULE_STR}\");" >> ${BUNDLE}
     elif [[ -f "${AEA_MODULES}/${MODULE_NAME}.ls" ]]; then 
         echo "INFO: ** Adding AKTOS module: '${MODULE_NAME}'"
-        MODULE_STR=$(lsc -cbp ${AEA_MODULES}/${MODULE_NAME}.ls | uglifyjs ${UGLIFYJS_OPTS} | sed 's/\"/\\\"/g' | sed "s/\n//g")
+        lsc -cbp ${AEA_MODULES}/${MODULE_NAME}.ls > ${AEA_MODULES}/${MODULE_NAME}.js || exit 1
+        MODULE_STR=$(cat ${AEA_MODULES}/${MODULE_NAME}.js | uglifyjs ${UGLIFYJS_OPTS} | sed 's/\"/\\\"/g' | sed "s/\n//g")
         echo "Modules.addCached(\"${MODULE_NAME}\", \"${MODULE_STR}\");" >> ${BUNDLE}
     else
         echo "INFO: ?? Module '${MODULE_NAME}' is embedded??"
