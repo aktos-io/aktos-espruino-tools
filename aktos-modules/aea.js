@@ -87,7 +87,6 @@ Led.prototype.turn = function(val){
 };
 Led.prototype.baseBlink = function(){
   var self;
-  console.log("iyidir");
   self = this;
   if (this.mode !== 'blink') {
     this.mode = 'blink';
@@ -127,10 +126,12 @@ Led.prototype.infoBlink = function(){
   return this.baseBlink();
 };
 Led.prototype.wink = function(){
-  this.mode = 'wink';
-  this.turn(true);
+  var self;
+  self = this;
+  self.mode = 'wink';
+  self.turn(true);
   return sleep(50, function(){
-    return this.turn(false);
+    return self.turn(false);
   });
 };
 out$.merge = merge;

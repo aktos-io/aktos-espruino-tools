@@ -76,8 +76,7 @@ Led.prototype.turn = (val) ->
     digital-write @pin, val
 
 Led.prototype.base-blink = ->
-    console.log "iyidir"
-    self = this 
+    self = this
     if @mode isnt \blink
         @mode = \blink
         <- :lo(op) ->
@@ -106,10 +105,11 @@ Led.prototype.info-blink = ->
     @base-blink!
 
 Led.prototype.wink = ->
-    @mode = \wink
-    @turn on
+    self = this
+    self.mode = \wink
+    self.turn on
     <- sleep 50ms
-    @turn off
+    self.turn off
 
 
 
