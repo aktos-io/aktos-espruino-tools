@@ -29,24 +29,37 @@ export repl =
 !function Config file-no
     self = this
     @file-no = file-no
-    Config.f = new (require "FlashEEPROM")(0x076000)
+    Config.f = new (require "FlashEEPROM")(0x077000)
     Config.f.endAddr = Config.f.addr + 1024
     @write-count = 0
+    @periodic-sync!
+
+Config.prototype.flush = !->
+    console.log "flushing to eeprom..."
+    @write @ram
+
+Config.prototype.periodic-sync = !->
+    self = this
+    <- :lo(op) ->
+        <- sleep 3600*1000ms
+        self.flush!
+        lo(op)
 
 Config.prototype.write = (data) !->
     if @write-count++ > 10
         Config.f.cleanup!
         @write-count = 0
     Config.f.write @file-no, pack data
+    @ram = data
 
 Config.prototype.read = ->
     try
         data = E.to-string Config.f.read @file-no
-        return unpack data
+        @ram = unpack data
+        @ram
     catch
-        console.log "ERROR CONFIG READ: ", e
-        console.log "raw data read: ", data
-        console.log "dump: ", @file-no,
+        console.log "ERROR CONFIG READ(#{@file-no}): #{e}, raw: #{data}"
+
 
 
 !function Led pin
