@@ -14,8 +14,17 @@ if [[ "$1" != "" ]]; then
     PORT="$1"
 fi
 
-#ESP_FIRMWARE_DIR="/home/ceremcem/embedded/Espruino/build/espruino_1v85.131_esp8266"
-ESP_FIRMWARE_DIR="${DIR}/firmware/espruino_1v85.131_esp8266"
+## Locate the firmware directory
+## -----------------------------
+##
+ESP_FIRMWARE_DIR="${DIR}/aktos-esprino-builds/latest"
+#ESP_FIRMWARE_DIR="/home/ceremcem/embedded/Espruino/build/espruino_1v85.134_esp8266"
+
+echo "=============================================="
+echo " USING FIRMWARE FROM: "
+echo "     ${ESP_FIRMWARE_DIR}"
+echo "=============================================="
+sleep 1
 
 # See ${ESP_FIRMWARE_DIR}/README_flash.md
 BAUD=115200
@@ -74,12 +83,12 @@ read -p ''
 CURR_DIR=$(pwd)
 cd ${ESP_FIRMWARE_DIR}
 
-#until esptool.py --port ${PORT} erase_flash
-#do
-#    wait-power-toggle
-#done
-#
-#wait-power-toggle
+until esptool.py --port ${PORT} erase_flash
+do
+    wait-power-toggle
+done
+
+wait-power-toggle
 
 until ${ESP_ESPRUINO_CMD}
 do

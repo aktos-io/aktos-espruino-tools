@@ -1,0 +1,3 @@
+[submodule "aktos-espruino-builds"]
+	path = aktos-espruino-builds
+	url = https://github.com/aktos-io/aktos-espruino-builds
