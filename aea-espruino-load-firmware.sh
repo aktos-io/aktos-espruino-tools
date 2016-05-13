@@ -18,7 +18,7 @@ fi
 ## -----------------------------
 ##
 #ESP_FIRMWARE_DIR="/home/ceremcem/embedded/Espruino/build/espruino_1v85.134_esp8266"
-ESP_FIRMWARE_DIR="${DIR}/aktos-esprino-builds/latest"
+ESP_FIRMWARE_DIR="${DIR}/aktos-espruino-builds/latest"
 
 echo "=============================================="
 echo " USING FIRMWARE FROM: "
@@ -92,6 +92,7 @@ wait-power-toggle
 
 until ${ESP_ESPRUINO_CMD}
 do
+    ls -l
     wait-power-toggle
 done
 
