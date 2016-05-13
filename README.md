@@ -16,7 +16,6 @@ programming embedded devices.
 2. UglifyJs (>=2.0)
 3. aktos-dcs (https://github.com/aktos-io/aktos-dcs)
 4. config-md (https://github.com/aktos-io/config-md)
-5. aktos-embedded-tools (https://github.com/aktos-io/aktos-embedded-tools)
 
 # Usage
 
