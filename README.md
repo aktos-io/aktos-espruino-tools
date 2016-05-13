@@ -15,6 +15,7 @@ programming embedded devices.
 1. Livescript
 2. UglifyJs (>=2.0)
 3. aktos-dcs
+4. config-md (https://github.com/aktos-io/config-md)
 
 # Usage
 
