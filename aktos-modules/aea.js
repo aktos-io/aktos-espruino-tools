@@ -36,7 +36,7 @@ function Config(fileNo){
   var self;
   self = this;
   this.fileNo = fileNo;
-  Config.f = new (require("FlashEEPROM"))(0x077000);
+  Config.f = new (require("FlashEEPROM"))(0x076000);
   Config.f.endAddr = Config.f.addr + 1024;
   this.writeCount = 0;
   this.periodicSync();
