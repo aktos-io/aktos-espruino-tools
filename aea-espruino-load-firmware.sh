@@ -92,7 +92,6 @@ wait-power-toggle
 
 until ${ESP_ESPRUINO_CMD}
 do
-    ls -l
     wait-power-toggle
 done
 
