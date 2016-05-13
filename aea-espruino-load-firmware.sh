@@ -1,11 +1,21 @@
 #!/bin/bash
 
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+
 PORT='/dev/ttyUSB0'
 if [[ "$1" != "" ]]; then
     PORT="$1"
 fi
 
-ESP_FIRMWARE_DIR="/home/ceremcem/embedded/Espruino/build/espruino_1v85.131_esp8266"
+#ESP_FIRMWARE_DIR="/home/ceremcem/embedded/Espruino/build/espruino_1v85.131_esp8266"
+ESP_FIRMWARE_DIR="${DIR}/firmware/espruino_1v85.131_esp8266"
 
 # See ${ESP_FIRMWARE_DIR}/README_flash.md
 BAUD=115200

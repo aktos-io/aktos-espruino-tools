@@ -30,30 +30,30 @@ export repl =
 !function Config file-no
     self = this
     @file-no = file-no
-    Config.f = new (require "FlashEEPROM")(0x077000)
+    Config.f = new (require "FlashEEPROM")(0x076000)
     Config.f.endAddr = Config.f.addr + 1024
     @write-count = 0
     @periodic-sync!
 
-Config.prototype.flush = !->
+Config::flush = !->
     console.log "flushing to eeprom..."
     @write @ram
 
-Config.prototype.periodic-sync = !->
+Config::periodic-sync = !->
     self = this
     <- :lo(op) ->
         <- sleep 3600*1000ms
         self.flush!
         lo(op)
 
-Config.prototype.write = (data) !->
+Config::write = (data) !->
     if @write-count++ > 10
         Config.f.cleanup!
         @write-count = 0
     Config.f.write @file-no, pack data
     @ram = data
 
-Config.prototype.read = ->
+Config::read = ->
     try
         data = E.to-string Config.f.read @file-no
         @ram = unpack data
@@ -71,11 +71,11 @@ Config.prototype.read = ->
     @off-time = 1000ms
 
 
-Led.prototype.turn = (val) ->
+Led::turn = (val) ->
     @mode = if val then \on else \off
     digital-write @pin, val
 
-Led.prototype.base-blink = ->
+Led::base-blink = ->
     self = this
     if @mode isnt \blink
         @mode = \blink
@@ -88,23 +88,23 @@ Led.prototype.base-blink = ->
             return op!
         console.log "blink ended, mode: ", self.mode
 
-Led.prototype.blink = ->
+Led::blink = ->
     @on-time = 1000ms
     @off-time = 1000ms
     @base-blink!
 
-Led.prototype.att-blink = ->
+Led::att-blink = ->
     @on-time = 300ms
     @off-time = 300ms
     @base-blink!
 
-Led.prototype.info-blink = ->
+Led::info-blink = ->
     # aircraft blink
     @on-time = 80ms
     @off-time = 2000ms
     @base-blink!
 
-Led.prototype.wink = ->
+Led::wink = ->
     self = this
     self.mode = \wink
     self.turn on
