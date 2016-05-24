@@ -1,5 +1,9 @@
 #!/bin/bash
 
+## Usage
+# load-firmware [/dev/ttyUSB0]
+# FLASH_SIZE=4MB load-firmware
+
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
@@ -38,7 +42,10 @@ ESP_4MB_CMD="esptool.py --port ${PORT} --baud ${BAUD} write_flash \
 
 
 ESP_ESPRUINO_CMD=${ESP_512K_CMD}
-FLASH_SIZE=$(config-md -i config.md -k "hardware.flash size")
+
+if [[ "$FLASH_SIZE" == "" ]]; then 
+    FLASH_SIZE=$(config-md -i config.md -k "hardware.flash size")
+fi
 echo "FLASH size: $FLASH_SIZE"
 if [[ "$FLASH_SIZE" == "4MB" ]]; then
     ESP_ESPRUINO_CMD=${ESP_4MB_CMD}
