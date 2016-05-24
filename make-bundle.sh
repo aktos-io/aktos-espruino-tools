@@ -27,6 +27,7 @@ BUNDLE_CONTENT=$(uglifyjs ${UGLIFYJS_OPTS} -- init.js)
 # Get initial modules that are required in "init.ls"
 req=$(echo ${BUNDLE_CONTENT} | grep -o 'require([\\\"a-zA-Z0-9]\+)' | sed 's|\\||g' | grep -o '".*"' | sed 's/"//g' | tr '\n' ' ')
 MODULES=(`echo ${req}`)
+ADDED_MODULES=()
 
 # debug
 for i in "${MODULES[@]}"; do echo "modules in init: $i"; done
@@ -36,42 +37,59 @@ for i in "${MODULES[@]}"; do echo "modules in init: $i"; done
 i=0
 while true; do
     MODULE_NAME="${MODULES[$i]}"
-    if [[ -f "${MODULES_DIR}/${MODULE_NAME}.js" ]]; then
-        echo "INFO: * Adding module: ${MODULE_NAME}"
-        MODULE_STR=$(uglifyjs ${UGLIFYJS_OPTS} -- ${MODULES_DIR}/${MODULE_NAME}.js | sed 's/\"/\\\"/g' | sed "s/\n//g")
-        echo "Modules.addCached(\"${MODULE_NAME}\", \"${MODULE_STR}\");" >> ${BUNDLE}
-    elif [[ -f "${AEA_MODULES}/${MODULE_NAME}.ls" ]]; then 
-        echo "INFO: ** Adding AKTOS module: '${MODULE_NAME}'"
-        lsc -cbp ${AEA_MODULES}/${MODULE_NAME}.ls > ${AEA_MODULES}/${MODULE_NAME}.js || exit 1
-        MODULE_STR=$(cat ${AEA_MODULES}/${MODULE_NAME}.js | uglifyjs ${UGLIFYJS_OPTS} | sed 's/\"/\\\"/g' | sed "s/\n//g")
-        echo "Modules.addCached(\"${MODULE_NAME}\", \"${MODULE_STR}\");" >> ${BUNDLE}
-    else
-        echo "INFO: ?? Module '${MODULE_NAME}' is embedded??"
-    fi
 
 
-    # Add if any subdependency is required
-    # ----------------------------------------
-    req=$(cat ${BUNDLE} | grep -o 'require([\\\"a-zA-Z0-9]\+)' | sed 's|\\||g' | grep -o '".*"' | sed 's/"//g' | tr '\n' ' ')
-    #echo "New dependencies: $req"
-    SUB_DEPS=(`echo ${req}`)
-    # add modules if not found in $MODULES
-    for j in "${SUB_DEPS[@]}"; do
-        #echo "DEBUG: looking for $j"
-        add="yes"
-        for k in "${MODULES[@]}"; do
-            #echo "DEBUG: ......modules so far: $k"
-            if [[ "$j" == "$k" ]]; then
-                add="no"
-                #echo "DEBUG: not adding module: $j"
-                break
-            fi
-        done
-        if [[ "$add" == "yes" ]]; then
-            echo "... Adding sub dependency: $j"
-            MODULES+=( "$j" )
+    ADDING_NEEDED=true
+    for aa in "${ADDED_MODULES[@]}"; do
+        if [ "$aa" == "${MODULE_NAME}" ] ; then
+            # do not add a module more than once
+            echo "INFO: Module ${MODULE_NAME} is already added, skipping..."
+            ADDING_NEEDED=false
         fi
     done
+
+
+    if $ADDING_NEEDED; then
+        if [[ -f "${MODULES_DIR}/${MODULE_NAME}.js" ]]; then
+            echo "INFO: * Adding module: ${MODULE_NAME}"
+            MODULE_STR=$(uglifyjs ${UGLIFYJS_OPTS} -- ${MODULES_DIR}/${MODULE_NAME}.js | sed 's/\"/\\\"/g' | sed "s/\n//g")
+            echo "Modules.addCached(\"${MODULE_NAME}\", \"${MODULE_STR}\");" >> ${BUNDLE}
+            ADDED_MODULES+=("${MODULE_NAME}")
+        elif [[ -f "${AEA_MODULES}/${MODULE_NAME}.ls" ]]; then
+            echo "INFO: ** Adding AKTOS module: '${MODULE_NAME}'"
+            lsc -cbp ${AEA_MODULES}/${MODULE_NAME}.ls > ${AEA_MODULES}/${MODULE_NAME}.js || exit 1
+            MODULE_STR=$(cat ${AEA_MODULES}/${MODULE_NAME}.js | uglifyjs ${UGLIFYJS_OPTS} | sed 's/\"/\\\"/g' | sed "s/\n//g")
+            echo "Modules.addCached(\"${MODULE_NAME}\", \"${MODULE_STR}\");" >> ${BUNDLE}
+            ADDED_MODULES+=("${MODULE_NAME}")
+        else
+            echo "INFO: ?? Module '${MODULE_NAME}' is embedded??"
+        fi
+
+
+        # Add if any subdependency is required
+        # ----------------------------------------
+        req=$(cat ${BUNDLE} | grep -o 'require([\\\"a-zA-Z0-9]\+)' | sed 's|\\||g' | grep -o '".*"' | sed 's/"//g' | tr '\n' ' ')
+        #echo "New dependencies: $req"
+        SUB_DEPS=(`echo ${req}`)
+        # add modules if not found in $MODULES
+        for j in "${SUB_DEPS[@]}"; do
+            #echo "DEBUG: looking for $j"
+            add="yes"
+            for k in "${MODULES[@]}"; do
+                #echo "DEBUG: ......modules so far: $k"
+                if [[ "$j" == "$k" ]]; then
+                    add="no"
+                    #echo "DEBUG: not adding module: $j"
+                    break
+                fi
+            done
+            if [[ "$add" == "yes" ]]; then
+                echo "... Adding sub dependency: $j"
+                MODULES+=( "$j" )
+            fi
+        done
+    fi
+
 
 
     i=$((i+1))
