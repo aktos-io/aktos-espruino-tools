@@ -7,12 +7,12 @@ export pack = (x) ->
 
 export unpack = (wire-data) ->
     try
-        x = JSON.parse wire-data
+        x = JSON.parse wire-data.trim!
         throw if x is void
         return x
     catch
         console.log "Error on unpacking: ", e
-        console.log "wire data: ", wire-data
+        console.log "Raw wire data: ", wire-data
         throw "Error on unpacking"
 
 export repl =
@@ -30,7 +30,8 @@ export repl =
 !function Config file-no
     self = this
     @file-no = file-no
-    Config.f = new (require "FlashEEPROM")(0x076000)
+    #Config.f = new (require "FlashEEPROM")(0x076000)
+    Config.f = new (require "FlashEEPROM")()
     Config.f.endAddr = Config.f.addr + 1024
     @write-count = 0
     @periodic-sync!

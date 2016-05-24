@@ -10,7 +10,7 @@ out$.pack = pack = function(x){
 out$.unpack = unpack = function(wireData){
   var x, e;
   try {
-    x = JSON.parse(wireData);
+    x = JSON.parse(wireData.trim());
     if (x === void 8) {
       throw null;
     }
@@ -18,7 +18,7 @@ out$.unpack = unpack = function(wireData){
   } catch (e$) {
     e = e$;
     console.log("Error on unpacking: ", e);
-    console.log("wire data: ", wireData);
+    console.log("Raw wire data: ", wireData);
     throw "Error on unpacking";
   }
 };
@@ -36,7 +36,7 @@ function Config(fileNo){
   var self;
   self = this;
   this.fileNo = fileNo;
-  Config.f = new (require("FlashEEPROM"))(0x076000);
+  Config.f = new (require("FlashEEPROM"))();
   Config.f.endAddr = Config.f.addr + 1024;
   this.writeCount = 0;
   this.periodicSync();
