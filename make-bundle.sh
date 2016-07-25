@@ -25,7 +25,7 @@ echo > ${BUNDLE}
 BUNDLE_CONTENT=$(uglifyjs ${UGLIFYJS_OPTS} -- init.js)
 
 # Get initial modules that are required in "init.ls"
-req=$(echo ${BUNDLE_CONTENT} | grep -o 'require([\\\"a-zA-Z0-9]\+)' | sed 's|\\||g' | grep -o '".*"' | sed 's/"//g' | tr '\n' ' ')
+req=$(echo ${BUNDLE_CONTENT} | grep -o 'require([\\\"a-zA-Z0-9_-]\+)' | sed 's|\\||g' | grep -o '".*"' | sed 's/"//g' | tr '\n' ' ')
 MODULES=(`echo ${req}`)
 ADDED_MODULES=()
 
