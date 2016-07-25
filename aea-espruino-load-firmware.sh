@@ -23,6 +23,7 @@ fi
 ##
 #ESP_FIRMWARE_DIR="/home/ceremcem/embedded/Espruino/build/espruino_1v85.134_esp8266"
 ESP_FIRMWARE_DIR="${DIR}/aktos-espruino-builds/latest"
+#ESP_FIRMWARE_DIR="/home/mesut/dev/espruino/espruino_1v86.199_esp8266"
 
 echo "=============================================="
 echo " USING FIRMWARE FROM: "
