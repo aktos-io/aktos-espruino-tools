@@ -4,7 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 MODULES_DIR="${DIR}/modules"
 AEA_MODULES="${DIR}/aktos-modules"
-
+CURR_MODULES="$PWD"
 
 # compress: {
 # sequences: true,
@@ -20,7 +20,7 @@ UGLIFYJS_OPTS="-m -c dead_code=true,if_return=true,unused=true,unsafe=true,hoist
 lsc -cb init.ls
 
 # create bundle
-BUNDLE="app.min.js"
+BUNDLE="init.min.js"
 echo > ${BUNDLE}
 BUNDLE_CONTENT=$(uglifyjs ${UGLIFYJS_OPTS} -- init.js)
 
@@ -50,7 +50,15 @@ while true; do
 
 
     if $ADDING_NEEDED; then
-        if [[ -f "${MODULES_DIR}/${MODULE_NAME}.js" ]]; then
+
+        if [[ -f "${CURR_MODULES}/${MODULE_NAME}.ls" ]]; then
+            echo "INFO: ** Adding APP module: '${MODULE_NAME}'"
+            lsc -cbp ${CURR_MODULES}/${MODULE_NAME}.ls > ${CURR_MODULES}/${MODULE_NAME}.js || exit 1
+            MODULE_STR=$(cat ${CURR_MODULES}/${MODULE_NAME}.js | uglifyjs ${UGLIFYJS_OPTS} | sed 's/\"/\\\"/g' | sed "s/\n//g")
+            echo "Modules.addCached(\"${MODULE_NAME}\", \"${MODULE_STR}\");" >> ${BUNDLE}
+            ADDED_MODULES+=("${MODULE_NAME}")
+
+        elif [[ -f "${MODULES_DIR}/${MODULE_NAME}.js" ]]; then
             echo "INFO: * Adding module: ${MODULE_NAME}"
             MODULE_STR=$(uglifyjs ${UGLIFYJS_OPTS} -- ${MODULES_DIR}/${MODULE_NAME}.js | sed 's/\"/\\\"/g' | sed "s/\n//g")
             echo "Modules.addCached(\"${MODULE_NAME}\", \"${MODULE_STR}\");" >> ${BUNDLE}
@@ -94,10 +102,10 @@ while true; do
 
     i=$((i+1))
     num_of_modules=${#MODULES[@]}
-    if (("$i" >= "$num_of_modules")) ; then 
+    if (("$i" >= "$num_of_modules")) ; then
         break
     fi
-done 
+done
 
 
 echo ${BUNDLE_CONTENT}  >> ${BUNDLE}
