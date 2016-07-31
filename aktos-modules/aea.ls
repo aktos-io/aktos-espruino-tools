@@ -1,18 +1,20 @@
 # lib functions
 export sleep = (ms, func) !-> set-timeout func, ms
 export after = sleep
+export looop = (ms, f) -> set-interval f, ms
+
 
 export pack = (x) ->
     JSON.stringify x
 
 export unpack = (wire-data) ->
     try
-        x = JSON.parse wire-data.trim!
+        x = JSON.parse wire-data
         throw if x is void
         return x
     catch
-        console.log "Error on unpacking: ", e
-        console.log "Raw wire data: ", wire-data
+        #console.log "Error on unpacking: ", e
+        #console.log "Raw wire data: ", wire-data
         throw "Error on unpacking"
 
 export repl =

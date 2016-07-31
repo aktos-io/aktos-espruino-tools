@@ -22,19 +22,12 @@ function LongPolling(settings){
   this.maxInterval = 5000;
 }
 LongPolling.prototype.on = function(event, callback){
-  var ref$;
-  return (ref$ = this.events)[event] = ref$[event].concat(callback);
+  return this.events[event] = callback;
 };
 LongPolling.prototype.trigger = function(name){
-  var event, i$, x$, ref$, len$, results$ = [];
+  var event;
   event = slice$.call(arguments, 1);
-  for (i$ = 0, len$ = (ref$ = this.events[name]).length; i$ < len$; ++i$) {
-    x$ = ref$[i$];
-    if (typeof x$ === 'function') {
-      results$.push(x$.apply(this, event));
-    }
-  }
-  return results$;
+  return this.events[name].apply(this, event);
 };
 LongPolling.prototype.send = function(p1, p2, p3){
   /*
@@ -198,10 +191,9 @@ LongPolling.prototype.putRaw = function(msg, path, callback){
           return callback(e, null);
         }
       });
-      res.on('error', function(){
+      return res.on('error', function(){
         throw "RES.ON ERROR???";
       });
-      return res.on('close', function(){});
     });
     req.on('error', function(err){
       return __.commErr(err, callback);
@@ -244,14 +236,15 @@ LongPolling.prototype.connect = function(nextStep){
           __.connected = true;
           __.connecting = false;
           __.receiveLoop();
-          __.trigger('connect', data);
-          if (typeof nextStep === 'function') {
-            return nextStep();
-          }
+          return sleep(0, function(){
+            __.trigger('connect', data);
+            return sleep(0, function(){
+              return nextStep();
+            });
+          });
         });
       } catch (e$) {
         e = e$;
-        console.log("LongPolling: Connect error : ", e);
         return sleep(10, function(){
           __.connecting = false;
           return __.connect();
@@ -271,8 +264,12 @@ LongPolling.prototype.receiveLoop = function(){
       if (err) {
         return op();
       } else {
-        __.trigger('data', res);
-        return lo(op);
+        return sleep(0, function(){
+          __.trigger('data', res);
+          return sleep(1500, function(){
+            return lo(op);
+          });
+        });
       }
     });
   }(function(){});

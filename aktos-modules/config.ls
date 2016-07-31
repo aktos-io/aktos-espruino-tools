@@ -1,36 +1,20 @@
-require! 'aea': {sleep}
+require! 'aea': {merge, pack, unpack}
+
+mem = new (require 'FlashEEPROM') 0x087000  # Something little bit more than Espruino size
+mem.endAddr = mem.addr + 1024
 
 export !function Config file-no
-    self = this
-    @file-no = file-no
-    #Config.f = new (require "FlashEEPROM")(0x076000)
-    Config.f = new (require "FlashEEPROM")()
-    Config.f.endAddr = Config.f.addr + 1024
-    @write-count = 0
-    @periodic-sync!
+    @f-no = file-no
+    Config.f = mem
+    @ram = {}
 
 Config::flush = !->
-    console.log "flushing to eeprom..."
-    @write @ram
-
-Config::periodic-sync = !->
-    self = this
-    <- :lo(op) ->
-        <- sleep 3600*1000ms
-        self.flush!
-        lo(op)
-
-Config::write = (data) !->
-    if @write-count++ > 10
-        Config.f.cleanup!
-        @write-count = 0
-    Config.f.write @file-no, pack data
-    @ram = data
+    #console.log "flushing to eeprom..."
+    Config.f.write @f-no, pack @ram
 
 Config::read = ->
     try
-        data = E.to-string Config.f.read @file-no
-        @ram = unpack data
+        @ram `merge` unpack E.to-string Config.f.read @f-no
         @ram
     catch
-        console.log "ERROR CONFIG READ(#{@file-no}): #{e}, raw: #{data}"
+        #console.log "ERROR CONFIG READ(#{@file-no}): #{e}, raw: #{data}"

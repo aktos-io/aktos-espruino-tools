@@ -1,14 +1,14 @@
 /** Create a new Flash EEPROM.
 
- `addr` - addr to start at (if left off, this will be the address 
-   after the last page of Flash. In the Original Espruino and 
+ `addr` - addr to start at (if left off, this will be the address
+   after the last page of Flash. In the Original Espruino and
    Espruino Pico, this is an flash page that isn't supposed to
    be in the chip - but which is on every one we have tested.
-   
- `flash` - the flash object to use (it will use the internal 
+
+ `flash` - the flash object to use (it will use the internal
    flash if this undefined). If an object implements read, write,
-   erasePage and getPage then it can be used 
-*/ 
+   erasePage and getPage then it can be used
+*/
 function FlashEEPROM(addr, flash) {
   this.flash = flash ? flash : require("Flash");
   if (addr) {
@@ -16,11 +16,11 @@ function FlashEEPROM(addr, flash) {
   } else if (this.flash.getFree!==undefined) {
     var free = this.flash.getFree();
     if (free.length) this.addr = free[0].addr;
-  } else { 
+  } else {
     // TODO: remove this after 1v86 is released
     var mem = process.memory();
     if (!mem.flash_start || !mem.flash_length)
-      throw "process.memory() didn't contain information about flash memory";  
+      throw "process.memory() didn't contain information about flash memory";
     this.addr = mem.flash_start + mem.flash_length;
   }
   var page = this.flash.getPage(this.addr);
@@ -30,10 +30,10 @@ function FlashEEPROM(addr, flash) {
 }
 
 /** Internal function - return an object containing:
-    * addr: the address in memory of the key (must be between 0 and 255), or -1 if it doesn't exist 
+    * addr: the address in memory of the key (must be between 0 and 255), or -1 if it doesn't exist
     * end: the address of the next free entry in memory
 */
-FlashEEPROM.prototype.getAddr = function(addr) { 
+FlashEEPROM.prototype.getAddr = function(addr) {
   // search for the last occurrence of the address in flash
   var n = this.addr;
   var key = this.flash.read(4, n);
@@ -50,7 +50,7 @@ FlashEEPROM.prototype.getAddr = function(addr) {
 /** Read the current value of a key (key must be between 0 and 255).
  This will return a Uint8Array. It can be converted to a string
  with E.toString() */
-FlashEEPROM.prototype.read = function(addr) { 
+FlashEEPROM.prototype.read = function(addr) {
   var lastAddr = this.getAddr(addr).addr;
   // if not found, return undefined
   if (lastAddr<0) return undefined;
@@ -62,10 +62,10 @@ FlashEEPROM.prototype.read = function(addr) {
 
 /** Read the current value of a key (key must be between 0 and 255).
  This will return a 'Memory Area' string, which directly references the
- data in flash memory rather than loading it into RAM first. This is 
+ data in flash memory rather than loading it into RAM first. This is
  useful when you've written a lot of data and you're trying to save
  RAM. */
-FlashEEPROM.prototype.readMem = function(addr) { 
+FlashEEPROM.prototype.readMem = function(addr) {
   var lastAddr = this.getAddr(addr).addr;
   // if not found, return undefined
   if (lastAddr<0) return undefined;
@@ -76,7 +76,7 @@ FlashEEPROM.prototype.readMem = function(addr) {
 };
 
 /// return the current values of all keys in an array
-FlashEEPROM.prototype.readAll = function() { 
+FlashEEPROM.prototype.readAll = function() {
   var data = [];
   var n = this.addr;
   var key = this.flash.read(4, n);
@@ -105,9 +105,9 @@ FlashEEPROM.prototype._write = function(n, addr, data) {
   return n+data.length;
 };
 
-/** Write a new value.  Addr must be between 0 and 255, data 
+/** Write a new value.  Addr must be between 0 and 255, data
  can be a string or uint8array but cannot be longer than 255 bytes */
-FlashEEPROM.prototype.write = function(addr, data) { 
+FlashEEPROM.prototype.write = function(addr, data) {
   data = E.toUint8Array(data);
   var a = this.getAddr(addr);
   // If we had the key already, check if it is the same

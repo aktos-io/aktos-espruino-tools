@@ -109,3 +109,4 @@ done
 
 
 echo ${BUNDLE_CONTENT}  >> ${BUNDLE}
+echo "save()" >> ${BUNDLE}
