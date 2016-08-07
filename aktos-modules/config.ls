@@ -13,7 +13,7 @@ require("Flash").getFree()
   { "addr": 1048576, "length": 3129344 }
  ]
 */
-mem = new (require 'FlashEEPROM') 487424  # Something little bit more than Espruino size
+mem = new (require 'FlashEEPROM')! # 487424  # Something little bit more than Espruino size
 mem.endAddr = mem.addr + 1024  # TODO: Understand why this is 1024!
 /*
 mem =
@@ -29,6 +29,8 @@ export !function Config file-no
 Config::flush = !->
     #console.log "flushing to eeprom..."
     Config.f.write @f-no, pack @ram
+    0
+
 
 Config::read = ->
     try

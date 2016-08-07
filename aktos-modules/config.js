@@ -14,7 +14,7 @@ require("Flash").getFree()
   { "addr": 1048576, "length": 3129344 }
  ]
 */
-mem = new (require('FlashEEPROM'))(487424);
+mem = new (require('FlashEEPROM'))();
 mem.endAddr = mem.addr + 1024;
 /*
 mem =
@@ -29,6 +29,7 @@ function Config(fileNo){
 }
 Config.prototype.flush = function(){
   Config.f.write(this.fNo, pack(this.ram));
+  0;
 };
 Config.prototype.read = function(){
   var e;

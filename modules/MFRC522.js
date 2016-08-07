@@ -24,7 +24,7 @@ var PICC = {
   SELECT1 : 0x93
 };
 
-var PCD = { 
+var PCD = {
   IDLE : 0x00,
   TRANSCIEVE : 0x0C
 };
@@ -65,7 +65,7 @@ MFRC522.prototype.init = function() {
   this.antenna(1);
 };
 
-MFRC522.prototype.req = function(data) {  
+MFRC522.prototype.req = function(data) {
   this.w(R.COMMAND, PCD.IDLE);
   this.w(R.COMIEN, 0x80 | 0x77);
   this.w(R.COMIRQ, 0x7F); // clear IRQs
@@ -97,7 +97,11 @@ MFRC522.prototype.getCardSerial = function() {
 MFRC522.prototype.findCards = function(callback) {
   // TODO: We can do this better I think - and can detect multiple cards
   if (this.isNewCard()) {
-    callback(this.getCardSerial());
+    var s = this.getCardSerial();
+    if (s.length > 0) {
+        callback(s);
+        s.length = 0; 
+    }
   }
 };
 
@@ -107,4 +111,3 @@ exports.connect = function(spi, cs) {
   m.init();
   return m;
 };
-

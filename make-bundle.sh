@@ -15,7 +15,9 @@ CURR_MODULES="$PWD"
 # if_return: true,
 # join_vars: true,
 # drop_console: true
-UGLIFYJS_OPTS="-m -c dead_code=true,if_return=true,unused=true,unsafe=true,hoist_vars=true"
+
+#PRODUCTION_OPTS="--pure-funcs=console.log --pure-funcs=log"
+UGLIFYJS_OPTS="-m -c dead_code=true,if_return=true,unused=false,unsafe=true,hoist_vars=true $PRODUCTION_OPTS"
 
 lsc -cb init.ls
 
@@ -52,7 +54,7 @@ while true; do
     if $ADDING_NEEDED; then
 
         if [[ -f "${CURR_MODULES}/${MODULE_NAME}.ls" ]]; then
-            echo "INFO: ** Adding APP module: '${MODULE_NAME}'"
+            echo "INFO: ** Adding ./App module: '${MODULE_NAME}'"
             lsc -cbp ${CURR_MODULES}/${MODULE_NAME}.ls > ${CURR_MODULES}/${MODULE_NAME}.js || exit 1
             MODULE_STR=$(cat ${CURR_MODULES}/${MODULE_NAME}.js | uglifyjs ${UGLIFYJS_OPTS} | sed 's/\"/\\\"/g' | sed "s/\n//g")
             echo "Modules.addCached(\"${MODULE_NAME}\", \"${MODULE_STR}\");" >> ${BUNDLE}
