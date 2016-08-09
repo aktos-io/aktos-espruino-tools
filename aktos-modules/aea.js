@@ -82,20 +82,27 @@ Led.prototype.osc = function(m){
     });
   }, m.t[0] + m.t[1]);
 };
-Led.prototype.wink = function(){
+Led.prototype.wink = function(i, d){
   var pin;
+  i == null && (i = true);
+  d == null && (d = 50);
   pin = this.pin;
   this.stop();
-  digitalWrite(pin, true);
-  return sleep(50, function(){
-    return digitalWrite(pin, false);
+  digitalWrite(pin, i);
+  return sleep(d, function(){
+    return digitalWrite(pin, !i);
   });
 };
 Led.prototype.warn = function(){
-  return this.osc({
-    c: Infinity,
-    t: [300, 5000]
-  });
+  var __;
+  this.stop();
+  __ = this;
+  return this.i = setInterval(function(){
+    __.wink();
+    sleep(100, function(){
+      return __.wink();
+    });
+  }, 5000);
 };
 Led.prototype.upps = function(){
   return this.osc({

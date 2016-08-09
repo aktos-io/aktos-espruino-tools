@@ -64,17 +64,21 @@ Led::osc = (m) ->
         __.stop! if ++cnt >= m.c
         ), (m.t.0 + m.t.1)
 
-Led::wink = ->
+Led::wink = (i=on, d=50ms)->
     pin = @pin
     @stop!
-    digital-write pin, on
-    <- sleep 50ms
-    digital-write pin, off
+    digital-write pin, i
+    <- sleep d # duration
+    digital-write pin, not i
 
 Led::warn = ->
-    @osc do
-        c: Infinity
-        t: [300ms, 5000ms]
+    @stop!
+    __ = @
+    @i = set-interval (!->
+        __.wink!
+        <- sleep 100ms 
+        __.wink!
+        ), 5000ms
 
 Led::upps = ->
     @osc do
