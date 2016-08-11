@@ -19,20 +19,28 @@ CURR_MODULES="$PWD"
 #PRODUCTION_OPTS="--pure-funcs=console.log --pure-funcs=log"
 UGLIFYJS_OPTS="-m -c dead_code=true,if_return=true,unused=false,unsafe=true,hoist_vars=true $PRODUCTION_OPTS"
 
-lsc -cb init.ls
+ENTRY_POINT=$1
+if [[ "$ENTRY_POINT" == "" ]]; then 
+    ENTRY_POINT="init.ls"
+fi 
+
+IFS='.' read -ra X <<< "$ENTRY_POINT"
+ENTRY_POINT="${X[0]}"
+    
+lsc -cb "${ENTRY_POINT}.ls"
 
 # create bundle
-BUNDLE="init.min.js"
+BUNDLE="${ENTRY_POINT}.min.js"
 echo > ${BUNDLE}
-BUNDLE_CONTENT=$(uglifyjs ${UGLIFYJS_OPTS} -- init.js)
+BUNDLE_CONTENT=$(uglifyjs ${UGLIFYJS_OPTS} -- ${ENTRY_POINT}.js)
 
-# Get initial modules that are required in "init.ls"
+# Get initial modules that are required in "${ENTRY_POINT}.ls"
 req=$(echo ${BUNDLE_CONTENT} | grep -o 'require([\\\"a-zA-Z0-9_-]\+)' | sed 's|\\||g' | grep -o '".*"' | sed 's/"//g' | tr '\n' ' ')
 MODULES=(`echo ${req}`)
 ADDED_MODULES=()
 
 # debug
-for i in "${MODULES[@]}"; do echo "modules in init: $i"; done
+for i in "${MODULES[@]}"; do echo "modules in ${ENTRY_POINT}: $i"; done
 
 # Register modules via `Modules.addCached()` method
 # see: http://forum.espruino.com/comments/12899741/
