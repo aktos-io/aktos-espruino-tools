@@ -1,4 +1,7 @@
 /* Copyright (c) 2015 Gordon Williams, Pur3 Ltd. See the file LICENSE for copying permission. */
+/* Edited by Cerem Cem ASLAN: ported some functions from
+    https://github.com/miguelbalboa/rfid/blob/55feec4399021dd7826db2e693d081973eca1414/MFRC522.h
+*/
 var R = {
   COMMAND : 0x01<<1,
   COMIEN : 0x02<<1,
@@ -16,7 +19,9 @@ var R = {
   PRESCALER : 0x2B<<1,
   RELOADH : 0x2C<<1,
   RELOADL : 0x2D<<1,
+  //RFCfgReg : 0x26 << 1,  // configures the receiver gain
   VERSION : 0x37<<1
+
 };
 
 var PICC = {
@@ -54,6 +59,16 @@ MFRC522.prototype.antenna = function(on) {
   if (on) this.w(R.TXCONTROL, this.r(R.TXCONTROL) | 0x03);
   else this.w(R.TXCONTROL, this.r(R.TXCONTROL) & ~0x03);
 };
+
+/*
+Working, but no need (cca)
+MFRC522.prototype.getAntennaGain = function(){
+    return this.r(R.RFCfgReg) & 0x07<<4;
+}
+MFRC522.prototype.setAntennaGain = function(){
+    return this.w(R.RFCfgReg, (0x07<<4 & 0xff ));
+}
+*/
 
 MFRC522.prototype.init = function() {
   this.w(R.MODE, 0x8D);
@@ -100,7 +115,7 @@ MFRC522.prototype.findCards = function(callback) {
     var s = this.getCardSerial();
     if (s.length > 0) {
         callback(s);
-        s.length = 0; 
+        s.length = 0;
     }
   }
 };
